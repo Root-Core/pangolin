@@ -1328,6 +1328,7 @@ export const oauthClients = pgTable(
         orgId: varchar("orgId")
             .notNull()
             .references(() => orgs.orgId, { onDelete: "cascade" }),
+        backchannelLogoutUri: varchar("backchannelLogoutUri"),
         createdAt: bigint("createdAt", { mode: "number" }).notNull(),
         updatedAt: bigint("updatedAt", { mode: "number" }).notNull()
     },
