@@ -1651,6 +1651,7 @@ export const oauthClients = sqliteTable(
             .notNull()
             .references(() => orgs.orgId, { onDelete: "cascade" }),
         backchannelLogoutUri: text("backchannelLogoutUri"),
+        postLogoutRedirectUris: text("postLogoutRedirectUris"),
         createdAt: integer("createdAt").notNull(),
         updatedAt: integer("updatedAt").notNull()
     },
