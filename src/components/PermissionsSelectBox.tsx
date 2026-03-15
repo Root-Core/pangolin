@@ -189,7 +189,7 @@ function getActionsCategories(root: boolean) {
             [t("actionUpdateVirtualApiKey")]: "updateVirtualApiKey"
         },
 
-        "OAuth Client": {
+        [t("permissionsCategoryOAuthClient")]: {
             [t("actionCreateOAuthClient")]: "createOAuthClient",
             [t("actionListOAuthClients")]: "listOAuthClients",
             [t("actionGetOAuthClient")]: "getOAuthClient",
