@@ -1252,6 +1252,7 @@ unauthenticated.get(
 // );
 
 unauthenticated.get("/user", verifySessionMiddleware, user.getUser);
+unauthenticated.patch("/user", verifySessionMiddleware, user.updateSelf);
 unauthenticated.post(
     "/user/locale",
     verifySessionMiddleware,
