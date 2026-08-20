@@ -1298,7 +1298,7 @@ export const oauthClients = pgTable(
     "oauthClients",
     {
         clientId: varchar("clientId").primaryKey(),
-        clientSecretHash: varchar("clientSecretHash"),
+        clientSecret: varchar("clientSecret"), // Encrypted with server secret
         lastChars: varchar("lastChars").notNull().default(""),
         clientName: varchar("clientName").notNull(),
         clientUri: varchar("clientUri"),
