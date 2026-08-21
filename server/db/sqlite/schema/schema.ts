@@ -1,7 +1,6 @@
 import { randomUUID } from "crypto";
 import { InferSelectModel, sql } from "drizzle-orm";
 import {
-    check,
     index,
     integer,
     primaryKey,
@@ -11,6 +10,7 @@ import {
     unique,
     uniqueIndex
 } from "drizzle-orm/sqlite-core";
+import type { ClientAuthenticationMethod } from "@server/lib/oauth/clientAuthMethods";
 
 export const domains = sqliteTable("domains", {
     domainId: text("domainId").primaryKey(),
@@ -1559,6 +1559,10 @@ export const oauthClients = sqliteTable(
         clientId: text("clientId").primaryKey(),
         clientSecret: text("clientSecret"), // Encrypted with server secret
         lastChars: text("lastChars").notNull().default(""),
+        clientAuthenticationMethod: text("clientAuthenticationMethod")
+            .notNull()
+            .$type<ClientAuthenticationMethod>()
+            .default("client_secret_jwt"),
         clientName: text("clientName").notNull(),
         clientUri: text("clientUri"),
         logoUri: text("logoUri"),
