@@ -5,7 +5,7 @@ import logger from "@server/logger";
 
 export type JsonErrorType = { error: string; error_description?: string };
 
-export async function verifyOauthClient(
+export async function verifyOAuthClient(
     req: Request,
     res: Response,
     next: NextFunction
@@ -17,7 +17,7 @@ export async function verifyOauthClient(
         logger.warn(error);
     }
 
-    return sendOAuthClientError(
+    return sendJsonHttpError(
         res,
         HttpCode.UNAUTHORIZED,
         {
@@ -28,27 +28,27 @@ export async function verifyOauthClient(
     );
 }
 
-export function sendOAuthClientError(
+export function sendJsonHttpError(
     res: Response,
     status: HttpCode,
-    oauthError: JsonErrorType,
-    addAuthHeader: boolean = false
+    jsonError: JsonErrorType,
+    authHeader: boolean = false
 ): Response {
-    if (addAuthHeader) {
+    if (authHeader) {
         // The header MUST have another parameter, recommended is "realm"
-        if (!(oauthError instanceof JsonHttpError)) {
-            if (Object.keys(oauthError).length === 0)
-                (oauthError as any)["realm"] = "oauth";
+        if (!(jsonError instanceof JsonHttpError)) {
+            if (Object.keys(jsonError).length === 0)
+                (jsonError as any)["realm"] = "oauth";
         }
         res.setHeader(
             "WWW-Authenticate",
-            `Basic ${Object.entries(oauthError)
+            `Basic ${Object.entries(jsonError)
                 .map((e) => e.join('="'))
-                .join('" ')}"`
+                .join('", ')}"`
         );
     }
 
-    return res.status(status).json(oauthError);
+    return res.status(status).json(jsonError);
 }
 
 export class JsonHttpError extends Error {

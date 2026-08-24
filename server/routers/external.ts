@@ -55,7 +55,7 @@ import {
     logActionAudit,
     verifyCertificateAccess,
     verifyAdmin,
-    verifyOauthClient
+    verifyOAuthClient
 } from "@server/middlewares";
 import { ActionsEnum } from "@server/auth/actions";
 import rateLimit, { ipKeyGenerator } from "express-rate-limit";
@@ -94,9 +94,9 @@ const oauthTokenRateLimit = rateLimit({
 });
 
 unauthenticated.post(
-    "/oauth/token",
+    "/oauth/token/issue",
     oauthTokenRateLimit,
-    verifyOauthClient,
+    verifyOAuthClient,
     express.urlencoded({ extended: false }),
     oauth.issueToken
 );
@@ -104,9 +104,9 @@ unauthenticated.get("/oauth/jwks", oauth.getJwks);
 unauthenticated.get("/oauth/userinfo", oauth.handleUserinfoRequest);
 unauthenticated.post("/oauth/userinfo", oauth.handleUserinfoRequest);
 unauthenticated.post(
-    "/oauth/revoke",
+    "/oauth/token/revoke",
     oauthTokenRateLimit,
-    verifyOauthClient,
+    verifyOAuthClient,
     express.urlencoded({ extended: false }),
     oauth.revokeToken
 );
