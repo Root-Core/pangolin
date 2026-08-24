@@ -29,7 +29,6 @@ import license from "#dynamic/license/license";
 import { fetchServerIp } from "@server/lib/serverIpService";
 import { initAiModelCatalog } from "@server/lib/aiModelCatalog";
 import type { OAuthClientWithSecret } from "./lib/oauth/clientAuth";
-import { ensureSigningKey } from "@server/lib/oauth/keys";
 
 async function startServers() {
     await setHostMeta();
@@ -40,7 +39,6 @@ async function startServers() {
     await license.check();
 
     await runSetupFunctions();
-    await ensureSigningKey();
 
     await fetchServerIp();
 
