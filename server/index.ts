@@ -92,6 +92,7 @@ declare global {
             aiBudget?: AiBudget;
             virtualApiKey?: VirtualApiKey;
             oauthClient?: OAuthClientWithSecret;
+            oauthBearerToken?: string;
             orgPolicyAllowed?: boolean;
         }
     }
