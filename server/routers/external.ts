@@ -149,7 +149,7 @@ authenticated.get(
     "/org/:orgId/oauth-clients/:clientId",
     verifyOrgAccess,
     verifyAdmin,
-    verifyUserHasAction(ActionsEnum.listOAuthClients),
+    verifyUserHasAction(ActionsEnum.getOAuthClient),
     oauth.getOAuthClient
 );
 authenticated.patch(
