@@ -54,7 +54,8 @@ import {
     verifyVirtualApiKeyAccess,
     logActionAudit,
     verifyCertificateAccess,
-    verifyAdmin
+    verifyAdmin,
+    verifyOauthClient
 } from "@server/middlewares";
 import { ActionsEnum } from "@server/auth/actions";
 import rateLimit, { ipKeyGenerator } from "express-rate-limit";
@@ -95,6 +96,7 @@ const oauthTokenRateLimit = rateLimit({
 unauthenticated.post(
     "/oauth/token",
     oauthTokenRateLimit,
+    verifyOauthClient,
     express.urlencoded({ extended: false }),
     oauth.issueToken
 );
@@ -104,6 +106,7 @@ unauthenticated.post("/oauth/userinfo", oauth.handleUserinfoRequest);
 unauthenticated.post(
     "/oauth/revoke",
     oauthTokenRateLimit,
+    verifyOauthClient,
     express.urlencoded({ extended: false }),
     oauth.revokeToken
 );
