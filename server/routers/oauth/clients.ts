@@ -156,15 +156,29 @@ export async function createOAuthClient(
             );
         }
 
+        // Public clients (auth method "none", RFC 8252) have no client secret; the
+        // authorization codes they receive are protected by mandatory PKCE instead.
+        const authMethod =
+            body.clientAuthenticationMethod ?? "client_secret_jwt";
+        if (authMethod === "none" && !body.pkceRequired) {
+            return next(
+                createHttpError(
+                    HttpCode.BAD_REQUEST,
+                    'Public clients ("none") must keep PKCE enabled'
+                )
+            );
+        }
+
         const clientId = generateIdFromEntropySize(25);
-        const clientSecret = generateIdFromEntropySize(32);
+        const clientSecret =
+            authMethod === "none" ? null : generateIdFromEntropySize(32);
         const key = config.getRawConfig().server.secret!;
         const scopes = normalizeScopes(body.scopes);
 
         await db.insert(oauthClients).values({
             clientId,
-            clientSecret: encrypt(clientSecret, key),
-            lastChars: clientSecret.slice(-4),
+            clientSecret: clientSecret ? encrypt(clientSecret, key) : null,
+            lastChars: clientSecret ? clientSecret.slice(-4) : "",
             clientName: body.clientName,
             clientUri: body.clientUri,
             logoUri: body.logoUri,
@@ -173,8 +187,7 @@ export async function createOAuthClient(
             redirectUris: body.redirectUris,
             scopes: buildScopeString(scopes),
             pkceRequired: body.pkceRequired,
-            clientAuthenticationMethod:
-                body.clientAuthenticationMethod ?? "client_secret_jwt",
+            clientAuthenticationMethod: authMethod,
             enabled: body.enabled,
             logoutTerminatesPangolinSession:
                 body.logoutTerminatesPangolinSession,
@@ -186,7 +199,7 @@ export async function createOAuthClient(
         return response(res, {
             data: {
                 clientId,
-                clientSecret
+                ...(clientSecret ? { clientSecret } : {})
             },
             success: true,
             error: false,
@@ -352,6 +365,34 @@ export async function updateOAuthClient(
             );
         }
 
+        // Switching to auth method "none" deletes the client secret
+        // Switching from auth method "none" issues a new client secret
+        let secretObject = {};
+        const resultingAuthMethod =
+            body.clientAuthenticationMethod ??
+            existingClient.clientAuthenticationMethod;
+        if (resultingAuthMethod === "none") {
+            if (!(body.pkceRequired ?? existingClient.pkceRequired)) {
+                return next(
+                    createHttpError(
+                        HttpCode.BAD_REQUEST,
+                        'Public clients ("none") must keep PKCE enabled'
+                    )
+                );
+            }
+
+            secretObject = { clientSecret: null, lastChars: "" };
+        } else if (existingClient.clientAuthenticationMethod === "none") {
+            const generatedSecret = generateIdFromEntropySize(32);
+            secretObject = {
+                clientSecret: encrypt(
+                    generatedSecret,
+                    config.getRawConfig().server.secret!
+                ),
+                lastChars: generatedSecret.slice(-4)
+            };
+        }
+
         const previousScopes = normalizeScopes(
             parseScopeStringSet(existingClient.scopes)
         );
@@ -370,6 +411,7 @@ export async function updateOAuthClient(
                     redirectUris: body.redirectUris,
                     pkceRequired: body.pkceRequired,
                     clientAuthenticationMethod: body.clientAuthenticationMethod,
+                    ...secretObject,
                     enabled: body.enabled,
                     logoutTerminatesPangolinSession:
                         body.logoutTerminatesPangolinSession,
@@ -404,7 +446,7 @@ export async function updateOAuthClient(
         });
 
         return response(res, {
-            data: null,
+            data: "clientSecret" in secretObject ? secretObject : null,
             success: true,
             error: false,
             message: "OAuth client updated",
@@ -517,6 +559,15 @@ export async function rotateOAuthClientSecret(
         if (!existingClient) {
             return next(
                 createHttpError(HttpCode.NOT_FOUND, "OAuth client not found")
+            );
+        }
+
+        if (existingClient.clientAuthenticationMethod === "none") {
+            return next(
+                createHttpError(
+                    HttpCode.BAD_REQUEST,
+                    "Public clients have no client secret to rotate"
+                )
             );
         }
 
