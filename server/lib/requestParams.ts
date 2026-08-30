@@ -39,7 +39,7 @@ export function parseBasicAuth(req: Request): BasicAuthString {
 
 export function parseBasicAuthString(str: string): BasicAuthString {
     const parts = str?.split(" ");
-    if (!parts || parts.length !== 2 || parts[0] !== "Basic") {
+    if (!parts || parts.length !== 2 || parts[0].toLowerCase() !== "basic") {
         throw new Error("Invalid or missing Basic Authorization header");
     }
 
@@ -69,7 +69,7 @@ export type BasicAuthString = {
 
 export function extractBearerToken(req: Request): string | null {
     const authHeader = req?.headers?.authorization;
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    if (!authHeader || !authHeader.toLowerCase().startsWith("bearer ")) {
         return null;
     }
 

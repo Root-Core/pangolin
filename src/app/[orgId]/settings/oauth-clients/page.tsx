@@ -24,7 +24,9 @@ export default async function OAuthClientsPage(props: OAuthClientsPageProps) {
             ResponseT<{ clients: PublicOAuthClient[] }>
         >(`/org/${params.orgId}/oauth-clients`, await authCookieHeader());
         clients = res.data.data?.clients || [];
-    } catch (e) {}
+    } catch (error) {
+        console.log(error);
+    }
 
     const rows: OAuthClientRow[] = clients.map((client) => ({
         clientId: client.clientId,

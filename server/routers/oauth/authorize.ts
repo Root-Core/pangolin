@@ -335,11 +335,11 @@ export async function handleAuthorizationConsent(
 
         const { interactionId, approved } = parsed.data;
 
+        // Consume interaction atomically to prevent replay / race conditions
         const [interaction] = await db
-            .select()
-            .from(oauthInteractions)
+            .delete(oauthInteractions)
             .where(eq(oauthInteractions.interactionId, interactionId))
-            .limit(1);
+            .returning();
 
         if (!interaction) {
             return next(
@@ -354,29 +354,13 @@ export async function handleAuthorizationConsent(
         }
 
         if (Date.now() > interaction.expiresAt) {
-            await db
-                .delete(oauthInteractions)
-                .where(
-                    eq(
-                        oauthInteractions.interactionId,
-                        interaction.interactionId
-                    )
-                );
+            // Interaction already consumed, no delete necessary
             return next(
                 createHttpError(HttpCode.BAD_REQUEST, "Interaction expired")
             );
         }
 
         if (!approved) {
-            await db
-                .delete(oauthInteractions)
-                .where(
-                    eq(
-                        oauthInteractions.interactionId,
-                        interaction.interactionId
-                    )
-                );
-
             const redirectTo = appendOAuthParams(interaction.redirectUri, {
                 error: "access_denied",
                 state: interaction.state
@@ -397,7 +381,8 @@ export async function handleAuthorizationConsent(
             .select({
                 orgId: oauthClients.orgId,
                 enabled: oauthClients.enabled,
-                redirectUris: oauthClients.redirectUris
+                redirectUris: oauthClients.redirectUris,
+                scopes: oauthClients.scopes
             })
             .from(oauthClients)
             .where(eq(oauthClients.clientId, interaction.clientId))
@@ -406,18 +391,11 @@ export async function handleAuthorizationConsent(
         const isClientStateValid =
             !!client &&
             client.enabled &&
-            client.redirectUris.includes(interaction.redirectUri);
+            client.redirectUris.includes(interaction.redirectUri) &&
+            isScopeSubset(interaction.scope, client.scopes);
 
         if (!isClientStateValid) {
-            await db
-                .delete(oauthInteractions)
-                .where(
-                    eq(
-                        oauthInteractions.interactionId,
-                        interaction.interactionId
-                    )
-                );
-
+            // Interaction already consumed, no delete necessary
             return next(
                 createHttpError(
                     HttpCode.BAD_REQUEST,
@@ -432,15 +410,7 @@ export async function handleAuthorizationConsent(
         );
 
         if (!isClientOrgMember) {
-            await db
-                .delete(oauthInteractions)
-                .where(
-                    eq(
-                        oauthInteractions.interactionId,
-                        interaction.interactionId
-                    )
-                );
-
+            // Interaction already consumed, no delete necessary
             const redirectTo = appendOAuthParams(interaction.redirectUri, {
                 error: "access_denied",
                 state: interaction.state
@@ -513,14 +483,7 @@ export async function handleAuthorizationConsent(
                 createdAt: now
             });
 
-            await trx
-                .delete(oauthInteractions)
-                .where(
-                    eq(
-                        oauthInteractions.interactionId,
-                        interaction.interactionId
-                    )
-                );
+            // Interaction already consumed, no delete necessary
         });
 
         const redirectTo = appendOAuthParams(interaction.redirectUri, {
