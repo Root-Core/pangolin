@@ -597,38 +597,46 @@ export const userSiteResources = sqliteTable("userSiteResources", {
         .references(() => siteResources.siteResourceId, { onDelete: "cascade" })
 });
 
-export const users = sqliteTable("user", {
-    userId: text("id").primaryKey(),
-    email: text("email"),
-    username: text("username").notNull(),
-    name: text("name"),
-    type: text("type").notNull(), // "internal", "oidc"
-    idpId: integer("idpId").references(() => idp.idpId, {
-        onDelete: "cascade"
-    }),
-    passwordHash: text("passwordHash"),
-    twoFactorEnabled: integer("twoFactorEnabled", { mode: "boolean" })
-        .notNull()
-        .default(false),
-    twoFactorSetupRequested: integer("twoFactorSetupRequested", {
-        mode: "boolean"
-    }).default(false),
-    twoFactorSecret: text("twoFactorSecret"),
-    emailVerified: integer("emailVerified", { mode: "boolean" })
-        .notNull()
-        .default(false),
-    dateCreated: text("dateCreated").notNull(),
-    termsAcceptedTimestamp: text("termsAcceptedTimestamp"),
-    termsVersion: text("termsVersion"),
-    marketingEmailConsent: integer("marketingEmailConsent", {
-        mode: "boolean"
-    }).default(false),
-    serverAdmin: integer("serverAdmin", { mode: "boolean" })
-        .notNull()
-        .default(false),
-    lastPasswordChange: integer("lastPasswordChange"),
-    locale: text("locale")
-});
+export const users = sqliteTable(
+    "user",
+    {
+        userId: text("id").primaryKey(),
+        email: text("email"),
+        username: text("username").notNull(),
+        name: text("name"),
+        type: text("type").notNull(), // "internal", "oidc"
+        idpId: integer("idpId").references(() => idp.idpId, {
+            onDelete: "cascade"
+        }),
+        passwordHash: text("passwordHash"),
+        twoFactorEnabled: integer("twoFactorEnabled", { mode: "boolean" })
+            .notNull()
+            .default(false),
+        twoFactorSetupRequested: integer("twoFactorSetupRequested", {
+            mode: "boolean"
+        }).default(false),
+        twoFactorSecret: text("twoFactorSecret"),
+        emailVerified: integer("emailVerified", { mode: "boolean" })
+            .notNull()
+            .default(false),
+        dateCreated: text("dateCreated").notNull(),
+        termsAcceptedTimestamp: text("termsAcceptedTimestamp"),
+        termsVersion: text("termsVersion"),
+        marketingEmailConsent: integer("marketingEmailConsent", {
+            mode: "boolean"
+        }).default(false),
+        serverAdmin: integer("serverAdmin", { mode: "boolean" })
+            .notNull()
+            .default(false),
+        lastPasswordChange: integer("lastPasswordChange"),
+        locale: text("locale")
+    },
+    (t) => [
+        uniqueIndex("uidx_user_username_internal")
+            .on(t.username)
+            .where(sql`${t.idpId} IS NULL`)
+    ]
+);
 
 export const securityKeys = sqliteTable("webauthnCredentials", {
     credentialId: text("credentialId").primaryKey(),

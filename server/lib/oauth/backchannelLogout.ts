@@ -170,7 +170,7 @@ export async function dispatchBackchannelLogout(
         logger.error(
             `dispatchBackchannelLogout failed for user ${userId}: ${err}`
         );
-        return null;
+        return clients;
     }
 }
 

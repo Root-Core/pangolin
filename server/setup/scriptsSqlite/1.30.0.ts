@@ -13,6 +13,10 @@ export default async function migration() {
     try {
         db.transaction(() => {
             db.prepare(
+                `CREATE UNIQUE INDEX IF NOT EXISTS 'uidx_user_username_internal' ON 'user' ('username') WHERE "idpId" IS NULL;`
+            ).run();
+
+            db.prepare(
                 `
                 CREATE TABLE IF NOT EXISTS 'oauthClients' (
                     'clientId' text PRIMARY KEY NOT NULL,

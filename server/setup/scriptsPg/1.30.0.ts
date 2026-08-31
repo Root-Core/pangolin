@@ -9,6 +9,10 @@ export default async function migration() {
     try {
         await db.execute(sql`BEGIN`);
 
+        await db.execute(
+            sql`CREATE UNIQUE INDEX IF NOT EXISTS "uidx_user_username_internal" ON "user" ("username") WHERE "idpId" IS NULL;`
+        );
+
         await db.execute(sql`
             CREATE TABLE IF NOT EXISTS "oauthClients" (
                 "clientId" text PRIMARY KEY NOT NULL,
