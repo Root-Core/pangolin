@@ -649,28 +649,38 @@ export const userSiteResources = pgTable(
     ]
 );
 
-export const users = pgTable("user", {
-    userId: varchar("id").primaryKey(),
-    email: varchar("email"),
-    username: varchar("username").notNull(),
-    name: varchar("name"),
-    type: varchar("type").notNull(), // "internal", "oidc"
-    idpId: integer("idpId").references(() => idp.idpId, {
-        onDelete: "cascade"
-    }),
-    passwordHash: varchar("passwordHash"),
-    twoFactorEnabled: boolean("twoFactorEnabled").notNull().default(false),
-    twoFactorSetupRequested: boolean("twoFactorSetupRequested").default(false),
-    twoFactorSecret: varchar("twoFactorSecret"),
-    emailVerified: boolean("emailVerified").notNull().default(false),
-    dateCreated: varchar("dateCreated").notNull(),
-    termsAcceptedTimestamp: varchar("termsAcceptedTimestamp"),
-    termsVersion: varchar("termsVersion"),
-    marketingEmailConsent: boolean("marketingEmailConsent").default(false),
-    serverAdmin: boolean("serverAdmin").notNull().default(false),
-    lastPasswordChange: bigint("lastPasswordChange", { mode: "number" }),
-    locale: varchar("locale")
-});
+export const users = pgTable(
+    "user",
+    {
+        userId: varchar("id").primaryKey(),
+        email: varchar("email"),
+        username: varchar("username").notNull(),
+        name: varchar("name"),
+        type: varchar("type").notNull(), // "internal", "oidc"
+        idpId: integer("idpId").references(() => idp.idpId, {
+            onDelete: "cascade"
+        }),
+        passwordHash: varchar("passwordHash"),
+        twoFactorEnabled: boolean("twoFactorEnabled").notNull().default(false),
+        twoFactorSetupRequested: boolean("twoFactorSetupRequested").default(
+            false
+        ),
+        twoFactorSecret: varchar("twoFactorSecret"),
+        emailVerified: boolean("emailVerified").notNull().default(false),
+        dateCreated: varchar("dateCreated").notNull(),
+        termsAcceptedTimestamp: varchar("termsAcceptedTimestamp"),
+        termsVersion: varchar("termsVersion"),
+        marketingEmailConsent: boolean("marketingEmailConsent").default(false),
+        serverAdmin: boolean("serverAdmin").notNull().default(false),
+        lastPasswordChange: bigint("lastPasswordChange", { mode: "number" }),
+        locale: varchar("locale")
+    },
+    (t) => [
+        uniqueIndex("uidx_user_username_internal")
+            .on(t.username)
+            .where(sql`${t.idpId} IS NULL`)
+    ]
+);
 
 export const newts = pgTable(
     "newt",

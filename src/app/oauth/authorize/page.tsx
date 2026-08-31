@@ -8,7 +8,7 @@ type OauthAuthorizePageProps = {
 
 function firstParam(value: string | string[] | undefined): string | undefined {
     if (Array.isArray(value)) {
-        return value[0];
+        throw new Error("Repeated OAuth authorization parameters are invalid");
     }
 
     return value;

@@ -131,7 +131,21 @@ export default function EditOAuthClientPage() {
                 }
                 return {
                     ...current,
-                    clientAuthenticationMethod: data.clientAuthenticationMethod
+                    clientName: data.clientName,
+                    redirectUris: data.redirectUris,
+                    clientUri: data.clientUri || null,
+                    logoUri: data.logoUri || null,
+                    backchannelLogoutUri: data.backchannelLogoutUri || null,
+                    postLogoutRedirectUris:
+                        data.postLogoutRedirectUris.length > 0
+                            ? data.postLogoutRedirectUris
+                            : null,
+                    scopes: data.scopes.join(" "),
+                    pkceRequired: data.pkceRequired,
+                    clientAuthenticationMethod: data.clientAuthenticationMethod,
+                    enabled: data.enabled,
+                    logoutTerminatesPangolinSession:
+                        data.logoutTerminatesPangolinSession
                 };
             });
 
