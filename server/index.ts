@@ -18,7 +18,8 @@ import {
     SiteResource,
     User,
     UserOrg,
-    VirtualApiKey
+    VirtualApiKey,
+    OauthClient
 } from "@server/db";
 import config from "@server/lib/config";
 import { setHostMeta } from "@server/lib/hostMeta";
@@ -93,7 +94,7 @@ declare global {
             aiModel?: AiModel;
             aiBudget?: AiBudget;
             virtualApiKey?: VirtualApiKey;
-            oauthClient?: OAuthClientWithSecret;
+            oauthClient?: OAuthClientWithSecret | OauthClient;
             oauthBearerToken?: OAuthValidatedToken;
             oauthIdToken?: OAuthSessionTokenIds;
             orgPolicyAllowed?: boolean;

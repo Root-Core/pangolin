@@ -113,11 +113,22 @@ export default function CreateOAuthClientPage() {
                 <CredenzaContent>
                     <CredenzaHeader>
                         <CredenzaTitle>
-                            {t("oauthClientSecretDialogTitle")}
+                            {t(
+                                createdSecret?.clientSecret
+                                    ? "oauthClientSecretDialogTitle"
+                                    : "oauthClientCreateSuccessTitle"
+                            )}
                         </CredenzaTitle>
-                        <CredenzaDescription>
-                            {t("oauthClientSecretDialogDescription")}
-                        </CredenzaDescription>
+                        {createdSecret?.clientSecret && (
+                            <CredenzaDescription>
+                                {t("oauthClientSecretDialogDescription")}
+                            </CredenzaDescription>
+                        )}
+                        {!createdSecret?.clientSecret && createdSecret && (
+                            <CredenzaDescription>
+                                {t("oauthClientPublicCreateSuccessDescription")}
+                            </CredenzaDescription>
+                        )}
                     </CredenzaHeader>
                     <CredenzaBody>
                         {createdSecret && (
@@ -130,11 +141,19 @@ export default function CreateOAuthClientPage() {
                                     />
                                 </div>
                                 <div className="space-y-1">
-                                    <Label>{t("oauthClientSecretLabel")}</Label>
-                                    <CopyTextBox
-                                        text={createdSecret.clientSecret}
-                                        wrapText
-                                    />
+                                    {createdSecret.clientSecret && (
+                                        <>
+                                            <Label>
+                                                {t("oauthClientSecretLabel")}
+                                            </Label>
+                                            <CopyTextBox
+                                                text={
+                                                    createdSecret.clientSecret
+                                                }
+                                                wrapText
+                                            />
+                                        </>
+                                    )}
                                 </div>
                             </div>
                         )}
