@@ -14,6 +14,7 @@ import { getUniqueSubnetForExitNode } from "@server/lib/exitNodes";
 import { fetchContainers } from "./dockerSocket";
 import { buildTargetConfigurationForNewtClient } from "./buildConfiguration";
 import { canCompress } from "@server/lib/clientVersionChecks";
+import { NewtErrorCodes, sendNewtError } from "./error";
 
 export const handleNewtRegisterMessage: MessageHandler = async (context) => {
     const { message, client, sendToClient } = context;
@@ -116,6 +117,7 @@ export const handleNewtRegisterMessage: MessageHandler = async (context) => {
             logger.error(
                 `No available subnets found for the new exit node id ${exitNodeId} and site id ${siteId}`
             );
+            sendNewtError(NewtErrorCodes.NO_AVAILABLE_SUBNET, newt.newtId);
             return;
         }
 
