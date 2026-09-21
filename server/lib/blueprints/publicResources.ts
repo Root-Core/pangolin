@@ -261,10 +261,18 @@ export async function updatePublicResources(
             resourceData.ssl == undefined || resourceData.ssl == null
                 ? true
                 : resourceData.ssl;
-        let headers = "";
-        if (resourceData.headers) {
-            headers = JSON.stringify(resourceData.headers);
-        }
+        // `headers` is a deprecated alias for `requestHeaders`
+        const mergedRequestHeaders = [
+            ...(resourceData.headers ?? []),
+            ...(resourceData.requestHeaders ?? [])
+        ];
+        const requestHeaders =
+            mergedRequestHeaders.length > 0
+                ? JSON.stringify(mergedRequestHeaders)
+                : null;
+        const responseHeaders = resourceData.responseHeaders?.length
+            ? JSON.stringify(resourceData.responseHeaders)
+            : null;
 
         if (resourceData.policy) {
             const isLicensed = await isLicensedOrSubscribed(
@@ -403,7 +411,8 @@ export async function updatePublicResources(
                                 ? resourceData.auth["whitelist-users"].length >
                                   0
                                 : false,
-                            headers: headers || null,
+                            requestHeaders,
+                            responseHeaders,
                             applyRules:
                                 resourceData.rules &&
                                 resourceData.rules.length > 0,
@@ -599,7 +608,8 @@ export async function updatePublicResources(
                             setHostHeader: resourceData["host-header"] || null,
                             tlsServerName:
                                 resourceData["tls-server-name"] || null,
-                            headers: headers || null,
+                            requestHeaders,
+                            responseHeaders,
                             maintenanceModeEnabled:
                                 resourceData.maintenance?.enabled,
                             maintenanceModeType: resourceData.maintenance?.type,
@@ -1222,7 +1232,8 @@ export async function updatePublicResources(
                     setHostHeader: resourceData["host-header"] || null,
                     tlsServerName: resourceData["tls-server-name"] || null,
                     ssl: resourceSsl,
-                    headers: headers || null,
+                    requestHeaders,
+                    responseHeaders,
                     applyRules:
                         resourceData.rules && resourceData.rules.length > 0,
                     pamMode: resourceData["auth-daemon"]?.pam || "passthrough",
