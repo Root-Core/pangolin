@@ -297,6 +297,11 @@ LQIDAQAB
                     if (!apiResponse?.success) {
                         throw new Error(apiResponse?.error);
                     }
+
+                    logger.debug(
+                        `License server response: ${JSON.stringify(apiResponse)}`
+                    );
+
                     // Reset failure count on success
                     this.phoneHomeFailureCount = 0;
                 } catch (e) {
@@ -359,6 +364,11 @@ LQIDAQAB
                         licenseKeyRes,
                         this.publicKey
                     );
+
+                    logger.debug(
+                        `Decoded license key ${key.licenseKey}: ${JSON.stringify(payload)}`
+                    );
+
                     cached.valid = payload.valid;
                     cached.type = payload.type;
                     cached.tier = payload.tier;
@@ -450,6 +460,8 @@ LQIDAQAB
         } finally {
             this.checkInProgress = false;
         }
+
+        logger.debug(`Computed license status: ${JSON.stringify(status)}`);
 
         this.statusCache.set(this.statusKey, status, 0);
         return status;

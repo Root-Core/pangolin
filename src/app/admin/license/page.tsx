@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { LicenseKeyCache } from "@server/license/license";
+import { LicenseKeyCache, LicenseKeyTier } from "@server/license/license";
 import { createApiClient } from "@app/lib/api";
 import { useEnvContext } from "@app/hooks/useEnvContext";
 import { toast } from "@app/hooks/useToast";
@@ -64,6 +64,23 @@ import { useTranslations } from "next-intl";
 const ENTERPRISE_DOCS_URL =
     "https://docs.pangolin.net/self-host/enterprise-edition";
 const ENTERPRISE_PRICING_URL = "https://pangolin.net/pricing#Self-Hosted";
+
+function getTierLabel(
+    tier: LicenseKeyTier | undefined,
+    t: (key: string) => string
+): string {
+    switch (tier) {
+        case "enterprise":
+            return t("licenseTierEnterprise");
+        case "tier1":
+            return t("licenseTierTier1");
+        case "tier2":
+            return t("licenseTierTier2");
+        case "personal":
+        default:
+            return t("licenseTierPersonal");
+    }
+}
 
 export default function LicensePage() {
     const api = createApiClient(useEnvContext());
@@ -513,6 +530,14 @@ export default function LicensePage() {
                                         {t("unlicensed")}
                                     </div>
                                 )}
+                            </div>
+                            <div className="space-y-2">
+                                <div className="text-sm font-medium">
+                                    {t("licenseTierLabel")}
+                                </div>
+                                <div className="text-lg">
+                                    {getTierLabel(licenseStatus?.tier, t)}
+                                </div>
                             </div>
                             {licenseStatus?.hostId && (
                                 <div className="space-y-2">
