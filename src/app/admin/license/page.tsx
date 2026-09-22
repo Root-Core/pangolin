@@ -49,6 +49,7 @@ import {
     ExternalLink,
     Heart,
     InfoIcon,
+    ShoppingCart,
     TicketCheck
 } from "lucide-react";
 import Link from "next/link";
@@ -64,6 +65,8 @@ import { useTranslations } from "next-intl";
 const ENTERPRISE_DOCS_URL =
     "https://docs.pangolin.net/self-host/enterprise-edition";
 const ENTERPRISE_PRICING_URL = "https://pangolin.net/pricing#Self-Hosted";
+const LICENSE_PORTAL_URL =
+    "https://app.pangolin.net/auth/login?internal_redirect=/settings/license?generate";
 
 function getTierLabel(
     tier: LicenseKeyTier | undefined,
@@ -392,6 +395,33 @@ export default function LicensePage() {
                 </DismissableBanner>
             )}
 
+            {licenseStatus?.isLicenseValid && rows.length > 0 && (
+                <DismissableBanner
+                    storageKey="license-upgrade-banner-dismissed"
+                    version={1}
+                    title={t("licenseUpgradeBannerTitle")}
+                    titleIcon={
+                        <ShoppingCart className="w-5 h-5 text-primary" />
+                    }
+                    description={t("licenseUpgradeBannerDescription")}
+                >
+                    <Link
+                        href={LICENSE_PORTAL_URL}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            className="gap-2 hover:bg-primary/10 hover:border-primary/50 transition-colors"
+                        >
+                            {t("licenseUpgradeBannerButton")}
+                            <ExternalLink className="w-4 h-4" />
+                        </Button>
+                    </Link>
+                </DismissableBanner>
+            )}
+
             {/* <Alert variant="neutral" className="mb-6"> */}
             {/*     <InfoIcon className="h-4 w-4" /> */}
             {/*     <AlertTitle className="font-semibold"> */}
@@ -538,6 +568,11 @@ export default function LicensePage() {
                                 <div className="text-lg">
                                     {getTierLabel(licenseStatus?.tier, t)}
                                 </div>
+                                {rows.length > 1 && (
+                                    <div className="text-sm text-muted-foreground">
+                                        {t("licenseMultipleKeysDescription")}
+                                    </div>
+                                )}
                             </div>
                             {licenseStatus?.hostId && (
                                 <div className="space-y-2">
