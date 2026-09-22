@@ -206,6 +206,7 @@ export function LicenseKeysDataTable({
             title={t("licenseKeys")}
             searchPlaceholder={t("licenseKeySearch")}
             searchColumn="licenseKey"
+            defaultSort={{ id: "terminateAt", desc: false }}
             onAdd={onCreate}
             addButtonText={t("licenseKeyAdd")}
             enableColumnVisibility={true}
