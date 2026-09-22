@@ -401,6 +401,35 @@ LQIDAQAB
                 }
             }
 
+            // Personal-tier licenses cannot coexist with a paid tier: if any
+            // valid host key is above personal, personal-tier keys are
+            // invalidated so they don't contribute to the totals below.
+            const hasHigherTierValidKey = keys.some((key) => {
+                const cached = newCache.get(key.licenseKey)!;
+                return (
+                    cached.type === "host" &&
+                    cached.valid &&
+                    tierRank(cached.tier) > tierRank("personal")
+                );
+            });
+
+            if (hasHigherTierValidKey) {
+                for (const key of keys) {
+                    const cached = newCache.get(key.licenseKey)!;
+                    if (
+                        cached.type === "host" &&
+                        cached.valid &&
+                        cached.tier === "personal"
+                    ) {
+                        logger.debug(
+                            `Invalidating personal license key ${key.licenseKey} because a higher tier license is present`
+                        );
+                        cached.valid = false;
+                        newCache.set(key.licenseKey, cached);
+                    }
+                }
+            }
+
             // Compute host status: quantity = users, quantity_2 = sites
             // When multiple host keys are active, prefer a valid key over an
             // invalid one, and among equally-valid keys prefer the highest tier.
