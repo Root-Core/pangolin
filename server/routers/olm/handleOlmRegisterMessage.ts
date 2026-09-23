@@ -277,7 +277,7 @@ export const handleOlmRegisterMessage: MessageHandler = async (context) => {
     );
 
     let jitMode = false;
-    if (sitesCount > 250 && build == "saas") {
+    if (sitesCount > org.settingsJitModeLimit && build == "saas") {
         // THIS IS THE MAX ON THE BUSINESS TIER
         // we have too many sites
         // If we have too many sites we need to drop into fully JIT mode by not sending any of the sites

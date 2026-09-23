@@ -78,7 +78,8 @@ export const orgs = sqliteTable("orgs", {
         { mode: "boolean" }
     )
         .notNull()
-        .default(false)
+        .default(false),
+    settingsJitModeLimit: integer("settingsJitModeLimit").notNull().default(250)
 });
 
 export const userDomains = sqliteTable("userDomains", {

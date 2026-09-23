@@ -78,7 +78,8 @@ export const orgs = pgTable("orgs", {
         "settingsEnableGlobalNewtAutoUpdate"
     )
         .notNull()
-        .default(false)
+        .default(false),
+    settingsJitModeLimit: integer("settingsJitModeLimit").notNull().default(250)
 });
 
 export const orgDomains = pgTable("orgDomains", {
