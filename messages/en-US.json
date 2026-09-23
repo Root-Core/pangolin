@@ -110,7 +110,7 @@
     "siteInstallNewt": "Install Site",
     "siteInstallNewtDescription": "Install the site connector for your system",
     "siteInstallKubernetesDocsDescription": "For more and up to date Kubernetes installation information, see <docsLink>docs.pangolin.net/manage/sites/install-kubernetes</docsLink>.",
-    "siteInstallAdvantechDocsDescription": "For Advantech modem installation instructions, see <docsLink>docs.pangolin.net/manage/sites/install-advantech</docsLink>.",
+    "siteInstallAdvantechDocsDescription": "For Advantech modem installation instructions, see <docsLink>docs.pangolin.net/manage/sites/install-newt#advantech-router-app</docsLink>.",
     "WgConfiguration": "WireGuard Configuration",
     "WgConfigurationDescription": "Use the following configuration to connect to the network",
     "operatingSystem": "Operating System",
