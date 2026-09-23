@@ -174,7 +174,6 @@ export const configSchema = z
                 maxmind_db_path: z.string().optional(),
                 maxmind_asn_path: z.string().optional()
             })
-            .optional()
             .prefault({}),
         postgres: z
             .object({

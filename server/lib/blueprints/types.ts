@@ -816,25 +816,20 @@ export const ConfigSchema = z
     .object({
         "proxy-resources": z
             .record(z.string(), PublicResourceSchema)
-            .optional()
             .prefault({}),
         "public-resources": z
             .record(z.string(), PublicResourceSchema)
-            .optional()
             .prefault({}),
         "client-resources": z
             .record(z.string(), PrivateResourceSchema)
-            .optional()
             .prefault({}),
         "private-resources": z
             .record(z.string(), PrivateResourceSchema)
-            .optional()
             .prefault({}),
         "public-policies": z
             .record(z.string(), ResourcePolicySchema)
-            .optional()
             .prefault({}),
-        sites: z.record(z.string(), SiteSchema).optional().prefault({})
+        sites: z.record(z.string(), SiteSchema).prefault({})
     })
     .transform((data) => {
         // Merge public-resources into proxy-resources
